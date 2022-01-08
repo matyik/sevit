@@ -11,7 +11,7 @@ app.listen(PORT)
 
 app.use(express.json())
 
-app.get(`/contract/:contractAddress/:method`, async (req, res) => {
+app.post(`/contract/:contractAddress/:method`, async (req, res) => {
   const ABI = req.body
   const { contractAddress, method } = req.params
   try {
