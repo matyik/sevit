@@ -11,16 +11,13 @@ app.listen(PORT)
 
 app.use(express.json())
 
-app.get(`/contract/:method`, async (req, res) => {
+app.get(`/contract/:contractAddress/:method`, async (req, res) => {
   const ABI = req.body
-  const { method } = req.params
-  const { contractAddress } = req.query
+  const { contractAddress, method } = req.params
   try {
     const contract = new web3.eth.Contract(ABI, contractAddress)
     const result = await contract.methods[method](
-      ...Object.entries(req.query)
-        .filter((query) => query[0] !== 'contractAddress')
-        .map((query) => query[1])
+      ...Object.values(req.query)
     ).call()
     res.json({ result })
   } catch (err) {
