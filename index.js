@@ -13,6 +13,11 @@ app.use(express.json())
 
 app.post(`/contract/:contractAddress/:method`, async (req, res) => {
   const ABI = req.body
+  if (Object.keys(ABI).length < 1) {
+    return res
+      .status(400)
+      .json({ error: 'Please provide the contract ABI in the request body' })
+  }
   const { contractAddress, method } = req.params
   try {
     const contract = new web3.eth.Contract(ABI, contractAddress)
@@ -34,6 +39,13 @@ app.get('/balance/:address', async (req, res) => {
     const balance = await web3.eth.getBalance(address)
     res.json({ balance })
   } catch (err) {
+    if (
+      err.message.indexOf(
+        "is invalid, the capitalization checksum test failed, or it's an indirect IBAN address which can't be converted"
+      ) !== -1
+    ) {
+      return res.status(400).json({ error: 'Please provide a valid address' })
+    }
     res.status(500).json({ error: err.message })
   }
 })
